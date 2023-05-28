@@ -35,3 +35,6 @@ terraform.rc
 
 # Data files
 *.csv
+
+# Getting Started Terraform
+Getting-Started-Terraform/
