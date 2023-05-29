@@ -9,11 +9,11 @@ provider "aws" {
 }
 
 #################################################################
-# DATA 
+# DATA
 #################################################################
 
-data "aws_ssm_parameter" "ami" {
-  name = var.ami_ssm_parameter
+data "aws_availability_zones" "available" {
+  state = "available"
 }
 
 #################################################################
@@ -36,9 +36,19 @@ resource "aws_internet_gateway" "igw" {
 }
 
 resource "aws_subnet" "subnet1" {
-  cidr_block              = var.subnet1_cidr_block
+  cidr_block              = var.subnets_cidr_block[0]
   vpc_id                  = aws_vpc.vpc.id
-  map_public_ip_on_launch = var.subnet1_map_public_ip_on_launch
+  map_public_ip_on_launch = var.subnet_map_public_ip_on_launch
+  availability_zone       = data.aws_availability_zones.available.names[0]
+
+  tags = local.common_tags
+}
+
+resource "aws_subnet" "subnet2" {
+  cidr_block              = var.subnets_cidr_block[1]
+  vpc_id                  = aws_vpc.vpc.id
+  map_public_ip_on_launch = var.subnet_map_public_ip_on_launch
+  availability_zone       = data.aws_availability_zones.available.names[1]
 
   tags = local.common_tags
 }
@@ -61,45 +71,61 @@ resource "aws_route_table_association" "rta-subnet1" {
   route_table_id = aws_route_table.rtb.id
 }
 
+resource "aws_route_table_association" "rta-subnet2" {
+  subnet_id      = aws_subnet.subnet2.id
+  route_table_id = aws_route_table.rtb.id
+}
+
 # SECURITY GROUPS #
 # Nginx security group
 
 resource "aws_security_group" "nginx-sg" {
-  name   = "nginx-sg"
+  name   = "nginx_sg"
   vpc_id = aws_vpc.vpc.id
 
-  # HTTP access from anywhere
   ingress {
-    from_port   = var.nginx_sg_ingress.from_port
-    to_port     = var.nginx_sg_ingress.to_port
-    protocol    = var.nginx_sg_ingress.protocol
-    cidr_blocks = var.nginx_sg_ingress.cidr_blocks
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # outbound internet access
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
-    from_port   = var.nginx_sg_egress.from_port
-    to_port     = var.nginx_sg_egress.to_port
-    protocol    = var.nginx_sg_egress.protocol
-    cidr_blocks = var.nginx_sg_egress.cidr_blocks
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = local.common_tags
 }
 
-# INSTANCES #
-resource "aws_instance" "nginx1" {
-  ami                    = nonsensitive(data.aws_ssm_parameter.ami.value)
-  instance_type          = var.nginx1_instance_type
-  subnet_id              = aws_subnet.subnet1.id
-  vpc_security_group_ids = [aws_security_group.nginx-sg.id]
-  user_data              = <<EOF
-#! /bin/bash
-sudo amazon-linux-extras install -y nginx1
-sudo service nginx start
-sudo rm /usr/share/nginx/html/index.html
-echo '<html><head><title>Taco Team Server</title></head><body><h1>Welcome to the Taco Team Server</h1></body></html>' | sudo tee /usr/share/nginx/html/index.html
-EOF
+resource "aws_security_group" "alb-sg" {
+  name   = "nginx_alb_sg"
+  vpc_id = aws_vpc.vpc.id
+
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
   tags = local.common_tags
 }

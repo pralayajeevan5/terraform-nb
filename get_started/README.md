@@ -291,3 +291,52 @@ output "public_dns_hostname" {
 |--------|-----------|
 |Local values allow you to define intermediate computed values that can be stored or reuse to make the configuration more readable, concise, and provide a single source of truth |The variables allow you to define dynamic values that can allow customization and flexibility in your Terraform deployments     |
 |Locals are like variables in a program|Variables are like input to a program|
+
+
+### Updating Your Configuration with More Resources
+
+What to do in this section:
+
+- Improving our architecture
+- Using the documentation
+- Adding resources
+- Viewing state data
+
+1. Improvements that can be made
+    1. Reduce the single points of failure
+        1. Add a second availability zone
+        2. Add a second EC2 instance
+        3. Add load balancing for instances
+    2. Maintain readability of code
+
+2. Additional Data Sources and Resources Required
+    ```hcl
+    # Data source
+    "aws_availability_zones" # List of current availability zones
+
+    # Load balancer resources
+    "aws_lb" # AWS Application Load Balancer
+    "aws_lb_target_group" # Target group for load balancer
+    "aws_lb_listener" # Listener configuration for target group
+    "aws_lb_target_group_attachment" # Attach to EC2 instances
+    ```
+
+3.State Data
+    1. It is stored in a JSON format.
+    2. You should not change this state data manually.
+    3. When terraform makes any changes state data is locked so conflicts arrive
+    
+4. State Commands
+    ```bash
+    # List all state resources
+    terraform state list
+
+    # Show a specific resource 
+    terraform state show ADDRESS
+
+    # Move an item in state
+    terraform state mv SOURCE DESTINATION
+
+    # Remove an item in state
+    terraform state rm ADDRESS
+    ```

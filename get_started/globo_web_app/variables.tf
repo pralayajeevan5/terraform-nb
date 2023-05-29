@@ -34,41 +34,19 @@ variable "vpc_enable_dns_hostnames" {
   default     = true
 }
 
-variable "subnet1_cidr_block" {
-  type        = string
-  description = "Subnet CIDR"
-  default     = "10.0.0.0/24"
+variable "subnets_cidr_block" {
+  type        = list(string)
+  description = "Subnets CIDR"
+  default     = ["10.0.0.0/24", "10.0.1.0/24"]
 }
 
-variable "subnet1_map_public_ip_on_launch" {
+variable "subnet_map_public_ip_on_launch" {
   type        = bool
   description = "Map Public IP on Launch"
   default     = true
 }
 
-variable "nginx_sg_ingress" {
-  type        = object({ from_port = number, to_port = number, protocol = string, cidr_blocks = list(string) })
-  description = "Nginx Security Group Ingress Configuration"
-  default = {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-variable "nginx_sg_egress" {
-  type        = object({ from_port = number, to_port = number, protocol = string, cidr_blocks = list(string) })
-  description = "Nginx Security Group Egress Configuration"
-  default = {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-}
-
-variable "nginx1_instance_type" {
+variable "nginx_instance_type" {
   type        = string
   description = "Nginx Instance Type"
   default     = "t2.micro"
