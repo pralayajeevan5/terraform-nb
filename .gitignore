@@ -38,3 +38,6 @@ terraform.rc
 
 # Getting Started Terraform
 Getting-Started-Terraform/
+
+# Environment variables file
+.env
