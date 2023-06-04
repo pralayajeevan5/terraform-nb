@@ -529,3 +529,130 @@ provisioner "remote-exec" {
     command = ["list", "of", "scripts"]
 }
 ```
+
+### Using Functions and Looping in Your Configuration
+
+What to do in this section:
+
+- Globomantics request
+- Loops and dynamic blocks
+- Using functions
+- Terraform console 
+
+#### Potential Improvements (Globomantics request)
+
+- Dynamically increase instances
+- Decouple the startup script (by making a template)
+- Simplify networking input
+    - Allow dynamic allocation of CIDR addresses to the subnets with the
+    help of the VPC CIDR
+- Add consistent naming prefix
+
+#### Looping Constructs
+
+- count 
+- for_each
+- dynamic blocks
+
+#### Count Syntax
+
+```
+resource "aws_instance" "web_servers" {
+    count = 3
+    tags = {
+        Name = "globo-web-${count.index}"
+    }
+}
+```
+
+#### Count References
+
+```
+<resource_type>.<name_label>[element].<attribute>
+aws_instance.web_servers[0].name # Single instance
+aws_instance.web_servers[*].name # All instances (will return a list of names)
+```
+
+#### For_each Syntax
+
+```
+resource "aws_s3_bucket_object" "taco_toppings" {
+    for_each = {
+        cheese = "cheese.png"
+        lettuce = "lettuce.png"
+    }
+
+    key = each.value
+    source = ".${each.value}"
+    tags = {
+        Name = each.key
+    }
+}
+```
+
+#### For_each References
+
+```
+<resource_type>.<name_label>[key].<attribute>
+aws_s3_bucket_object.taco_toppings["cheese"].id # Single instance
+aws_s3_bucket_object.taco_toppings[*].id # All instances
+```
+
+#### Looping Targets
+
+```
+# Primary resources
+"aws_subnets" # count loop
+"aws_instance" # count loop
+"aws_s3_bucket_object # for_each loop
+
+# Impacted resources
+"aws_route_table_association"
+"aws_lb_target_group_attachment"
+```
+
+#### Terrform Expressions
+
+- Interpolation and heredoc
+- Arithmetic and logical operators
+- Conditional Expressions
+- For expressions
+
+#### Terraform Functions
+
+- Built-in Terraform
+- A signature of a function may look like this`Func_name(arg1, arg2, arg3, ...)`
+- Terraform function arguments are not names but positional
+- You could test function by placing them in the configuration and running a
+plan but that is a bit time consuming and difficult to debug so terraform has
+provided us with a console. 
+- `terraform console` will also load up all the state data.
+- Terraform has over 100 functions.
+
+#### Common Function Categories
+
+- According to the documentation there are 9 function categories with more to
+come in the future.
+
+1. Numeric, e.g. min(42, 13, 7)
+2. String, e.g. lower("TACOS") 
+3. Collection, e.g. merge(map1, map2)
+4. IP network, e.g. cidrsubnet
+5. Filesystem, e.g. file(path)
+6. Type conversion, e.g. toset()
+
+#### Functions to Use
+
+```
+# Startup script
+templatefile(file_location, { map of variables })
+
+# Extract subnet address from VPC CIDR
+cidrsubnet(cidr_range, subnet bits to add, network number)
+
+# Add tags to common tags
+merge(common_tags, { map of additional tags })
+
+# S3 bucket name
+lower("bucket name")
+```

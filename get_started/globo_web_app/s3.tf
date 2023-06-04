@@ -26,25 +26,24 @@ resource "aws_s3_bucket_policy" "weblog" {
 
 
 ## aws_s3_bucket_object
-resource "aws_s3_object" "website_index" {
-  bucket       = aws_s3_bucket.weblog.id
-  key          = "website/index.html"
-  source       = "website/index.html"
-  content_type = "text/html"
-}
+resource "aws_s3_object" "weblog_bucket_objects" {
+  for_each = {
+    "website" = "website/index.html",
+    "logo"    = "website/Globo_logo_Vert.png"
+  }
 
-resource "aws_s3_object" "website_logo" {
-  bucket       = aws_s3_bucket.weblog.id
-  key          = "website/Globo_logo_Vert.png"
-  source       = "website/Globo_logo_Vert.png"
-  content_type = "image/png"
+  bucket = aws_s3_bucket.weblog.id
+  key    = each.value
+  source = each.value
+
+  tags = local.common_tags
 }
 
 
 ## aws_iam_role
 # This role is used by the EC2 instance to access the S3 bucket
 resource "aws_iam_role" "instance" {
-  name = "weblog-instance"
+  name = "${local.name_prefix}-weblog-instance"
   tags = local.common_tags
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -62,7 +61,7 @@ resource "aws_iam_role" "instance" {
 
 ## aws_iam_role_policy
 resource "aws_iam_role_policy" "instance" {
-  name = "weblog-instance"
+  name = "${local.name_prefix}-weblog-instance"
   role = aws_iam_role.instance.id
 
   policy = jsonencode({
@@ -79,7 +78,7 @@ resource "aws_iam_role_policy" "instance" {
 
 ## aws_iam_instance_profile
 resource "aws_iam_instance_profile" "nginx" {
-  name = "nginx"
+  name = "${local.name_prefix}-nginx"
   role = aws_iam_role.instance.id
   tags = local.common_tags
 }

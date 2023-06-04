@@ -1,3 +1,9 @@
+variable "naming_prefix" {
+  type        = string
+  description = "Naming prefix for all resources"
+  default     = "globoweb"
+}
+
 variable "aws_region" {
   type        = string
   description = "AWS Region"
@@ -22,6 +28,12 @@ variable "vpc_enable_dns_hostnames" {
   default     = true
 }
 
+variable "vpc_subnet_count" {
+  type        = number
+  description = "Number of Subnets to create"
+  default     = 2
+}
+
 variable "subnets_cidr_block" {
   type        = list(string)
   description = "Subnets CIDR"
@@ -32,6 +44,12 @@ variable "subnet_map_public_ip_on_launch" {
   type        = bool
   description = "Map Public IP on Launch"
   default     = true
+}
+
+variable "nginx_instance_count" {
+  type        = number
+  description = "Number of Nginx Instances to create"
+  default     = 2
 }
 
 variable "nginx_instance_type" {
