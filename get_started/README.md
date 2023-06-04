@@ -656,3 +656,140 @@ merge(common_tags, { map of additional tags })
 # S3 bucket name
 lower("bucket name")
 ```
+
+
+### Using a Module for Common Configuration
+
+What to do in this section:
+
+- What is a module
+- Globomantics updates
+- Using existing modules
+- Creating new modules
+
+#### Terraform Modules
+
+- A module is a directory containing .tf or .tf.json files. The main 
+configuraion we are working with is known as a root module.
+- We can invoke modules to create resources. Modules forms a hierarchy with the 
+root module at the top. Our root module can invoke a child module which can
+further invoke another child module.
+- For example, we create a module to create a load balancer named *lb* the *lb*
+module then uses other modules like *vpc* and *ec2* to create the VPC and EC2
+instances.
+- The motivation behind modules is reuse configuration/code.
+- You can get modules from your local filesystem, remote registry or any 
+properly implemented website that follow the hashicorp provider protocol. The
+most common source is the public registry.
+- The modules that are hosted on the registry are versioned in the same way as
+provider plugins.
+- `terraform init` will download the modules in your current working directory.
+- You can create multiple instances of a module using `count` or `for_each`
+loops.
+
+#### Module Components
+
+You do not **need** any of these to make a module but these are the components
+a module is made up of.
+
+- Input variables
+- Output values
+- Resources & Data sources
+
+#### Potential Improvements (Globomantics updates)
+
+- Leverage the VPC module for networking
+- Create a module for S3 buckets
+    - Include load balancer permissions
+    - Include instance profile permissions
+
+#### Module Structure
+
+```
+# s3/main.tf
+
+variable "bucket_name" {}
+
+resource "aws_s3_bucket" "bucket" {
+    name = var.bucket_name
+    ...
+}
+
+output "bucket_id" {
+    value = aws_s3_bucket.bucket_id
+}
+```
+
+#### Scoping
+
+- The only way for a parent module to pass information to a child module is
+through input variables.
+- The child module has no access to local values, resource attributes or input
+variables of the parent modules.
+- The parent modules has no access to the local values, resource attributes of
+the child module. The only way to pass information back to the parent module is
+throught output values.
+- The input variables and output values support any datatype of terraform.
+
+#### Module Syntax
+
+```
+# s3.tf
+
+module "name_label" {
+    source = "local_or_remote_source"
+    version = "version_expression"
+
+    # If you would like to use a specific provider instance 
+    providers = {
+        module_provider = parent_provider
+    }
+    
+    # Input variables values...
+}
+```
+
+example:
+
+```
+module "taco_bucket" {
+    source = "./s3"
+
+    # Input variable values...
+    bucket_name = "mah_bucket"
+}
+```
+
+#### Module Reference
+
+```
+module.<name_label>.<output_name>
+module.taco_bucket.bucket_id
+```
+
+#### For Expressions
+
+- For expressions are a way to create a new collection based off of another
+collection object.
+- Input types: List, set, tuple, map, or object. 
+- Result types: Tuple or object.
+- You can do filtering with if statements.
+
+#### S3 Module
+
+```
+# Input variables - variables.tf
+"bucket_name" # Name of bucket
+"elb_service_account_arn" # ARN of ELB service account
+"common_tags" # Tags to apply to resources
+
+# Resources - main.tf
+"aws_s3_bucket"
+"aws_iam_role"
+"aws_iam_role_policy"
+"aws_iam_instance_profile"
+
+# Output - outputs.tf
+"web_bucket" # Full bucket object
+"instance_profile" # Full instance profile object
+```

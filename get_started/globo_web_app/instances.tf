@@ -14,14 +14,14 @@ resource "aws_instance" "nginx_servers" {
   count                  = var.nginx_instance_count
   ami                    = nonsensitive(data.aws_ssm_parameter.ami.value)
   instance_type          = var.nginx_instance_type
-  subnet_id              = aws_subnet.subnets[(count.index % var.vpc_subnet_count)].id
+  subnet_id              = module.vpc.public_subnets[(count.index % var.vpc_subnet_count)]
   vpc_security_group_ids = [aws_security_group.nginx_sg.id]
-  iam_instance_profile   = aws_iam_instance_profile.nginx.name
-  depends_on             = [aws_iam_instance_profile.nginx]
+  depends_on             = [module.s3]
+  iam_instance_profile   = module.s3.instance_profile.name
   tags                   = merge(local.common_tags, { Name = "${local.name_prefix}-nginx-${count.index}" })
 
   user_data_replace_on_change = true
   user_data = templatefile("${path.module}/templates/startup_script.tpl", {
-    s3_bucket_name = aws_s3_bucket.weblog.id
+    s3_bucket_name = module.s3.bucket.id
   })
 }
