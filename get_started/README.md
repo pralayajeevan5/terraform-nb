@@ -657,7 +657,6 @@ merge(common_tags, { map of additional tags })
 lower("bucket name")
 ```
 
-
 ### Using a Module for Common Configuration
 
 What to do in this section:
@@ -793,3 +792,67 @@ collection object.
 "web_bucket" # Full bucket object
 "instance_profile" # Full instance profile object
 ```
+
+### Using Workspaces for Multiple Environments
+
+What to do in this section:
+
+- Globomantics expansion
+- Reusing configurations
+- Using Workspaces
+
+#### Globomantics Scenario (Globomantics expansion)
+
+Handle multiple environments (Development, User Acceptance Testing, Production)
+
+#### Challenges for multiple environment setup
+
+- **Commonality and differences:** Environments will have more in common than 
+they have differences between them. Your *dev* should be very close to your 
+*UAT* and your *UAT* should be very close to your *production*.
+- **Abstactions and reuse:** It is also important to have abstarction in the
+configuraion so we can apply different values and making your code reuseable.
+- **Production access:** The access to *production* will probably be different
+than the access to the *UAT* and *dev* (lower environments).
+- **Using Workspaces:** One of the ways to create multiple ways to create an
+environment is to use workspaces. It is hashicorp's recommended way of handling
+multiple environments.
+
+#### Multiple Environment Decisions
+
+- **State management**
+    - Where will your state data going to live?
+    - How are you going to manage your state data for multiple environments?
+- **Variable values**
+    - Where are you going to store variable values? (files, cmdline, 3rd party)
+- **Credential management**
+    - Where are you going to store the different credentials?
+    - How are you going to manage them?
+- **Complexity and Overhead**
+    - What is the balance that you wanna achieve with complexity of the 
+    configuration and the administrative overhead? (Complexity and Overhead are
+    inversely propostional)
+
+#### Handling State For Multiple Environments
+
+##### Manually
+
+![Manually handling state for multiple environments](resources/state-file-example.png)
+    
+##### Terraform Workspaces
+
+![Workspace handling state for multiple environments](resources/workspace-example.png)
+
+#### Changes According to the Environment
+
+![Variables to change](resources/variables-to-change.png)
+
+#### Sensitive Values
+
+- Variables file
+- Environment variables
+- Secrets service
+
+**Note: State data will contain sensitive data in clear text. So store state
+data in a secure location**
+

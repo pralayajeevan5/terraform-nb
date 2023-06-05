@@ -17,9 +17,8 @@ variable "ami_ssm_parameter" {
 }
 
 variable "vpc_cidr_block" {
-  type        = string
+  type        = map(string)
   description = "VPC CIDR"
-  default     = "10.0.0.0/16"
 }
 
 variable "vpc_enable_dns_hostnames" {
@@ -29,9 +28,8 @@ variable "vpc_enable_dns_hostnames" {
 }
 
 variable "vpc_subnet_count" {
-  type        = number
+  type        = map(number)
   description = "Number of Subnets to create"
-  default     = 2
 }
 
 variable "subnets_cidr_block" {
@@ -47,15 +45,13 @@ variable "subnet_map_public_ip_on_launch" {
 }
 
 variable "nginx_instance_count" {
-  type        = number
+  type        = map(number)
   description = "Number of Nginx Instances to create"
-  default     = 2
 }
 
 variable "nginx_instance_type" {
-  type        = string
+  type        = map(string)
   description = "Nginx Instance Type"
-  default     = "t2.micro"
 }
 
 variable "company" {
