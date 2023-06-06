@@ -41,3 +41,6 @@ Getting-Started-Terraform/
 
 # Environment variables file
 .env
+
+# Deep Dive Terraform
+Deep-Dive-Terraform/
