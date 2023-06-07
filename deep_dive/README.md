@@ -49,8 +49,72 @@ terraform import -var-file="terraform.tfvars" \
 ```
 
 ### Managing State in Terraform
+
+- State data exploration
+- Backend options for state data
+- Migrating state data
+
+#### Terraform State
+
+- JSON format (Do not touch!)
+- Resources mappings and metadata
+- Inspect through CLI
+- Refreshed during operations
+- Stored in backends
+    - Standard & enhanced (stores and also runs terraform CLI commands)
+    - Locking & workspaces
+
+#### Terraform State Commands
+
+- `list`: lsit objects in state data
+- `show`: show details about an object
+- `mv`: move an item in state
+- `rm`: remove an item from state
+- `pull`: output current state to stdout
+- `push`: update remote state from local
+
+#### Backends
+
+- State data is stored in backends
+- Backends must be initialized
+- Parial configurations are recommended
+    - If you have credentials for the remote backend it should not be hard
+    coded and must be passed at run time
+- Interpolation is not supported
+
+##### Backend Example
+
+```hcl
+# Basic backend configuration
+
+terraform {
+    backend "type" {
+        # backend info
+        # authentication info
+    }
+}
+```
+
+##### Types of Backends
+
+1. Consul
+2. AWS S3 (has to be used with DynamoDB to support locking and workspaces)
+3. Azure Storage
+4. Google Cloud Storage
+
+#### Consul Access
+
+![Consul Access](./resources/consul-access.png)
+
+#### Migrating Terraform State
+
+- Update backend configuration
+- Run terraform init
+- Confirm state migration
+
 ### Using Data Sources and Templates
 ### Using Workspaces and Collaboration
 ### Troubleshooting Terraform
 ### Adding Terraform to a CI/CD Pipeline
 ### Integrating with Configuration Managers
+
