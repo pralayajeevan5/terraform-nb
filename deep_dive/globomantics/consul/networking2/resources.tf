@@ -6,7 +6,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "~>5.0"
+      version = "~>3.0"
     }
     consul = {
       source  = "hashicorp/consul"
@@ -64,7 +64,7 @@ locals {
 # NETWORKING #
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
-  version = "~>5.0"
+  version = "~>2.0"
 
   name = "globo-primary"
 
@@ -73,8 +73,16 @@ module "vpc" {
   private_subnets = data.template_file.private_cidrsubnet.*.rendered
   public_subnets  = data.template_file.public_cidrsubnet.*.rendered
 
-  enable_nat_gateway           = false
+  enable_nat_gateway = false
+
   create_database_subnet_group = false
+
 
   tags = local.common_tags
 }
+
+
+
+
+
+

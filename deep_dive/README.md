@@ -113,6 +113,154 @@ terraform {
 - Confirm state migration
 
 ### Using Data Sources and Templates
+
+- Data source types
+- Config from external sources
+- Templates, templates, templates
+
+#### More Teams, More Problems
+
+- Information Security (Define roles, policies, and groups)
+- Software Development (Read network configuration for app deployment)
+- Change Management (Store configuration data centrally)
+
+#### Data Sources
+
+- Glue for multiple configurations
+- Resources are data sources
+- Providers have data sources
+- Alternate data sources
+    - Template
+    - HTTP
+    - External (runs a script which has to return a valid json)
+    - Consul
+
+##### HTTP Data Source
+
+```
+# Example data source
+data "http" "my_ip" {
+    url = "http://ifconfig.me"
+}
+
+# Using the response
+data.http.my_ip.body
+```
+
+##### Consul Data Source
+
+```
+# Consul data source
+data "consul_keys" "networking" {
+    key {
+        name = "vpc_cidr_range"
+        path = "networking/config/vpc/cidr_range"
+        defualt = "10.0.0.0/16"
+    }
+}
+
+# Using the resource
+data.consul_keys.networking.var.vpc_cidr_range
+```
+
+#### Consul Setup
+
+![Consul Setup](resources/consul-setup.png)
+
+#### Templates
+
+- Manipulation of strings
+- Template is an **overloaded term**
+    - Quoted strings
+    - Heredoc syntax
+    - Provider
+    - Function
+- Interpolation and directives
+
+##### Template Strings
+
+- When you do any interpolation you are basically using a template
+- They are expressed in the configuration directly and doesn't require another
+file
+- You can use heredoc syntax for readability
+
+```hcl
+# Simple interpolation
+"${var.prefix}-app"
+
+# Conditional directive
+"%{ if var.prefix != "" }${var.prefix}-app%{ else }generic-app%{ endif }"
+
+# Collection directive with heredoc
+<<EOT
+%{ for name in local.names }
+${name}-app
+%{ endfor }
+EOT
+```
+
+##### Template Syntax In-line
+
+```hcl
+# Template data source
+data "template_file" "example" {
+    count = "2"
+    template = "$${var1}-$${current_count}"
+    vars = {
+        var1 = var.some_string
+        current_count = count.index
+    }
+}
+
+# Using the template
+data.template._file.example.rendered
+```
+
+##### Template Syntax File
+
+```hcl
+# Template configuration
+data "template_file" "peer-role" {
+    template = file("peer_policy.txt")
+    vars = {
+        vpc_arn = vpc.vpc_arn
+    }
+}
+
+# or
+
+templatefile("peer_policy.txt", {
+        vpc_arn = var.vpc_arn 
+    }
+)
+```
+
+```txt
+# peer_policy.txt
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "ec2:AcceptVpcPeeringConnection",
+                "ec2:DescribeVpcPeeringConnections"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "${vpc_arn}"
+            ]
+        }
+    }
+}
+```
+
+#### Summary
+
+- Templates for code reuse
+- Data sources glue configs together
+- Custom data sources are an option
+
 ### Using Workspaces and Collaboration
 ### Troubleshooting Terraform
 ### Adding Terraform to a CI/CD Pipeline
