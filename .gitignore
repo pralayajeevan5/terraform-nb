@@ -42,5 +42,8 @@ Getting-Started-Terraform/
 # Environment variables file
 .env
 
+# Ignore hidden shell script files
+.*.sh
+
 # Deep Dive Terraform
 Deep-Dive-Terraform/

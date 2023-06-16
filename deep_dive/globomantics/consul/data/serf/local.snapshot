@@ -4,3 +4,16 @@ alive: caramel-v2 127.0.0.1:8301
 event-clock: 2
 alive: caramel-v2 127.0.0.1:8301
 event-clock: 3
+alive: caramel-v2 192.168.1.69:8301
+event-clock: 4
+alive: caramel-v2 192.168.1.69:8301
+leave
+clock: 1
+alive: caramel-v2 192.168.1.69:8301
+event-clock: 1
+alive: caramel-v2 192.168.1.69:8301
+event-clock: 2
+alive: caramel-v2 192.168.1.69:8301
+event-clock: 3
+alive: caramel-v2 192.168.1.69:8301
+event-clock: 4

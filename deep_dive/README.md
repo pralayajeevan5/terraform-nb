@@ -262,6 +262,35 @@ templatefile("peer_policy.txt", {
 - Custom data sources are an option
 
 ### Using Workspaces and Collaboration
+
+- Using workspaces for environments
+- Collaborating with remote state
+- Use remote state as a data source
+
+#### Globomantics Environment
+
+- Work with the larger team
+- Create infrastructure for other teams
+- Enable collaboration through remote state
+
+#### State as Data Source
+
+```hcl
+data "terraform_remote_state" "networking" {
+    backend = "consul"
+    config = {
+        path = var.network_path
+        address = var.consul_address
+        scheme = var.consul_scheme
+    }
+}
+```
+
+#### Summary
+
+- Workspaces for environments
+- Remote state for collaboration
+
 ### Troubleshooting Terraform
 ### Adding Terraform to a CI/CD Pipeline
 ### Integrating with Configuration Managers
