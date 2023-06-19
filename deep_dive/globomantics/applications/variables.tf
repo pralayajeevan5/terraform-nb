@@ -1,5 +1,7 @@
 variable "region" {
-  default = "us-east-1"
+  type        = string
+  description = "AWS region to deploy to"
+  default     = "ap-south-1"
 }
 
 # Consul variables

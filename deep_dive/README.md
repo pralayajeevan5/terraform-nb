@@ -292,6 +292,111 @@ data "terraform_remote_state" "networking" {
 - Remote state for collaboration
 
 ### Troubleshooting Terraform
+
+- Validating configurations
+- Enable verbose logging
+- Resource taints
+- Crash logs
+
+#### Globomantics Environment
+
+- Application team update
+- Troubleshooting deployment issues
+- Panic! at the Terraform
+
+##### Application update
+
+We have the public subnet and the private subnet. The webservers are sitting in
+a public subnet while the database and its read-only copy are sitting in the
+private subnet.
+
+The webserver are not logging their data to a centralized location and we need
+to change that, they would like to create an s3 bucket and they want the data 
+to be written to that bucket. To achieve this they will need to create an IAM
+role and associate it with each instance.
+
+#### Types of Errors
+
+- Command error
+    - Happens at the command line
+    - Bad CLI syntax or arguments
+    - Use the help argument to understand the command or go and read the docs
+- Syntax validation
+    - It checks both the syntax and the logic
+    - Does not check state
+    - It can be done manually by using `terraform validate` but it will also
+    happen automatically if you use `terraform plan`, `terraform apply`, and
+    even when you try and change terraform workspaces
+- Provider validation and Deployment error (this is where we get into resource 
+taints)
+    - Provider validation happens during `terraform plan` and deployment errors
+    happen during `terraform apply`
+    - Read the error message, then read it again, and then read it again. Some
+    times you might go into a rabbit hole and then discover that the error
+    message was something else entirely
+    - If you cannot find enough details in the error message, enable verbose 
+    logging at a level which is appropriate for you to get what you need
+    - During deployment sometimes resouces will be created and that were not
+    created properly
+        - Sometimes terraform knows that and sometimes it doesn't
+        - If it doesn't then you can taint the resource manually to force
+        creation
+- Panic! (Sometimes terraform just breaks, **no application is perfect that
+includes terraform**)
+
+#### Verbose Logging
+
+- It exposes the actions terraform is taking
+- You can enable it by setting the `TF_LOG` to one of stages mentioned below
+- You can also add it to a file by setting `TF_LOG_PATH`
+- The stages of logs going from highest verbose to the least are `TRACE`, 
+`DEBUG`, `INFO`, `WARN`, `ERROR`. Generally you should set it to `WARN` or 
+`INFO`
+- Useful in automation
+
+#### Resource Taints
+
+- They are a way to mark a resource for recreation
+- Sometimes terraform will taint automatically but if it doesn't then you can
+taint resources manually by identifying its address within terraform.
+- Resources can also be untainted
+
+##### Taint and Untaint Command
+
+```
+# Command syntax
+terraform taint [options] address
+
+# Example single resource
+terraform taint aws_instance.example
+
+# Example module or collection
+terraform taint aws_instance.collection[0]
+terraform taint module.asg.aws_instance.example
+
+# Untaint syntax
+terraform untaint [options] address
+
+# Example single resource
+terraform untaint aws_instance.example
+```
+
+#### Crash Log
+
+- Generated when terraform panics
+- Caused by Terraform or provider
+- Similar to trace logging
+- Open an issue on GitHub
+
+#### Summary
+
+- Errors can and will happen
+- When you do get an error, read it twice
+- When error is not giving you any information go to verbose logging
+- Use taints to force recreation of resources but pay attention to the 
+lifecycle of those resources so that they are destroyed and created in a proper
+order
+
 ### Adding Terraform to a CI/CD Pipeline
 ### Integrating with Configuration Managers
 

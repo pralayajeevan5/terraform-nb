@@ -14,6 +14,11 @@ terraform {
       source  = "hashicorp/consul"
       version = "~> 2.0"
     }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   backend "consul" {
@@ -58,6 +63,10 @@ resource "aws_launch_template" "webapp_lt" {
   instance_type = local.asg_instance_size
 
   user_data = filebase64("./templates/userdata.sh")
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.asg.name
+  }
 
   network_interfaces {
     associate_public_ip_address = true
