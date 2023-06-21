@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        "org.jenkinsci.plugins.terraform.TerraformInstallation" "terraform-1.5.0"
+        "org.jenkinsci.plugins.terraform.TerraformInstallation" "terraform"
     }
     parameters {
         string(name: 'CONSUL_STATE_PATH', defaultValue: 'networking/state/globo-primary')
@@ -9,7 +9,7 @@ pipeline {
     }
 
     environment {
-        TF_HOME = tool('terraform-1.5.0')
+        TF_HOME = tool('terraform')
         TF_INPUT = '0'
         TF_IN_AUTOMATION = 'TRUE'
         TF_VAR_consul_address = 'host.docker.internal'
