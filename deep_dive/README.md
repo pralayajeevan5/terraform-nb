@@ -398,5 +398,68 @@ lifecycle of those resources so that they are destroyed and created in a proper
 order
 
 ### Adding Terraform to a CI/CD Pipeline
+
+- Level setting with terminology
+- Automation with Globomantics
+- Considerations for automation and CI/CD
+
+#### Source Control Management
+
+- Multiple formats (Git, TFVC, Subversion)
+- Multiple platforms (GitHub, BitBucket, GitLab, CodeCommit)
+- Enable collaboration
+- Version controlled
+
+#### CI/CD Pipelines
+
+- Multiple platforms (Jenkins, CodePipeline, Bamboo)
+- Continuous Integration for code check-in
+- Continuous Delivery of builds
+- Automated testing and validation
+- Multiple environments (Development, UAT, QA, Production)
+
+#### Globomantics Automation Toolset
+
+- GitHub for SCM
+- Jenkins for CI/CD
+- Consul for Config Data
+
+#### Running Automation with Terraform
+
+- Where are you going to get your **plugins source** from and are you gonna utilize SCM.
+Some companies would like the plugins to be stored locally so they are not 
+being downloaded everytime.
+- **Workspaces** are highly encourged while using terraform in these pipelines.
+- Remote **state control** are highly advised. Even though you can do it 
+locally it is much better to have a remote state control for collaboration and
+availability.
+- **Output control** is nessecessary as terraform outputs a lot of information
+and sometime this property can cause problems during automations. So, terraform
+has an environment variable called `TF_IN_AUTOMATION` which tells terraform 
+that a human is not going to watch this output so reduce it.
+- What's the **Deployment Pattern** to follow when using automation. Normally
+the pattern is to initialize, plan, and apply, but, there are couple of things
+to consider when we talk in the context of automation. Once the plan is 
+generated do you want someone to authorize the plan before you apply (in prod
+you probably do, in development you probably do not)
+- How do you wanna do **Error Handling** when in a pipeline? Do you wanna log 
+it, notify, and etc.
+
+#### Automation Environment Variables
+
+- `TF_IN_AUTOMATION = TRUE` (It can be set to any value)
+- `TF_LOG = INFO` (If something does go wrong you are not there to see it so 
+its better to log a more detailed version of execution so later you can 
+directly check the logs instead of running the pipeline again)
+- `TF_LOG_PATH = tf_log_MMDDYY_hhmmss`
+- `TF_INPUT = FALSE` (If this is set to `FALSE` then terraform won't wait for
+any user input. If it needs any user input then it will simply error out rather
+than wait around)
+- `TF_VAR_<name> = <value>` (If you write the name and value of the variable in
+the <name> and <value> position then terraform will use those are variables. It
+is an easy way to pass variables to terraform)
+- `TF_CLI_ARGS = -input=false` (It is an easy way to add arguments to cli 
+commands)
+
 ### Integrating with Configuration Managers
 
