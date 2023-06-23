@@ -26,7 +26,7 @@ pipeline {
                 dir('deep_dive/globomantics/networking/') {
                     sh """#!/bin/bash
                     terraform -version
-                    terraform init -backend-config='path=${params.CONSUL_STATE_PATH}'
+                    terraform init -backend-config="path=${params.CONSUL_STATE_PATH}"
                     """
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
         stage('NetworkValidate') {
             steps {
                 dir('deep_dive/globomantics/networking/') {
-                    sh 'terraform validate'
+                    sh "terraform validate"
                 }
             }
         }
