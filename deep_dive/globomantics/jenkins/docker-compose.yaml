@@ -8,4 +8,4 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
-      - "./jenkins_home:/var/jenkins_home"
+      - "./jenkins_home:/var/jenkins_home",,
